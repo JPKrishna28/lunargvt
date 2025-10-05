@@ -3,7 +3,13 @@
 An interactive 3D visualization demonstrating how the Moon's gravitational pull causes tides on Earth, built with Three.js.
 
 ![Lunar Tides Simulation](https://img.shields.io/badge/Three.js-r160-blue)
+![Vite](https://img.shields.io/badge/Vite-5.0-646CFF?logo=vite)
 ![License](https://img.shields.io/badge/license-MIT-green)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/JPKrishna28/lunargvt)
+
+## 🎬 Live Demo
+
+🌍 **[View Live Demo](https://lunargvt.vercel.app)** *(Update with your actual Vercel URL)*
 
 ## 🌟 Features
 
@@ -62,6 +68,26 @@ npm run dev
 npm run build
 npm run preview
 ```
+
+## 🚀 Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/JPKrishna28/lunargvt)
+
+### Quick Deploy
+
+1. **One-Click Deploy**: Click the button above
+2. **Manual Deploy**:
+   ```bash
+   # Install Vercel CLI
+   npm i -g vercel
+   
+   # Deploy
+   vercel
+   ```
+
+3. **GitHub Integration**: Connect your repo to Vercel for automatic deployments
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
 
 ## 🎮 How to Use
 
