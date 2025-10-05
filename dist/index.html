@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lunar Tides - Interactive Simulation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      background: #000;
+      color: #fff;
+    }
+
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* Overlay Container */
+    #ui-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* Title Bar */
+    #title {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 18px 25px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      border-bottom: 1px solid rgba(79, 195, 247, 0.2);
+      pointer-events: auto;
+    }
+
+    h1 {
+      font-size: 26px;
+      color: #4FC3F7;
+      margin-bottom: 6px;
+    }
+
+    p {
+      font-size: 15px;
+      color: #B0BEC5;
+    }
+
+    /* Left Controls */
+    #controls {
+      position: absolute;
+      top: 50%;
+      left: 25px;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(12px);
+      padding: 25px 30px;
+      border-radius: 16px;
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      width: 300px;
+      box-sizing: border-box;
+      z-index: 100;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    #controls::-webkit-scrollbar {
+      width: 6px;
+    }
+    #controls::-webkit-scrollbar-thumb {
+      background: #4FC3F7;
+      border-radius: 3px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 14px;
+      color: #B0BEC5;
+      min-width: 120px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: #37474F;
+      outline: none;
+      appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #4FC3F7;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .value-display {
+      width: 40px;
+      text-align: right;
+      color: #4FC3F7;
+      font-size: 14px;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      border-top: 1px solid rgba(79, 195, 247, 0.3);
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 12px 20px;
+      background: #4FC3F7;
+      border: none;
+      border-radius: 10px;
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #29B6F6;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(79, 195, 247, 0.3);
+    }
+
+    button.active {
+      background: #FF6B6B;
+    }
+
+    /* Info Box on Right */
+    #info {
+      position: absolute;
+      top: 50%;
+      right: 25px;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 14px;
+      pointer-events: auto;
+      max-width: 260px;
+      box-shadow: 0 0 10px rgba(79, 195, 247, 0.2);
+    }
+
+    #info h3 {
+      font-size: 17px;
+      margin-bottom: 10px;
+      color: #4FC3F7;
+      text-align: center;
+    }
+
+    #info ul {
+      list-style: none;
+      font-size: 13px;
+      color: #B0BEC5;
+      line-height: 1.6;
+      padding-left: 0;
+    }
+
+    #info li::before {
+      content: "→ ";
+      color: #4FC3F7;
+    }
+
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      color: #4FC3F7;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      #title {
+        text-align: center;
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      p {
+        font-size: 13px;
+      }
+
+      #controls {
+        left: 10px;
+        top: auto;
+        bottom: 10px;
+        transform: none;
+        width: 90%;
+        max-width: none;
+        padding: 15px 20px;
+        gap: 12px;
+      }
+
+      label {
+        font-size: 13px;
+        min-width: 100px;
+      }
+
+      .value-display {
+        width: 35px;
+        font-size: 13px;
+      }
+
+      #info {
+        display: none;
+      }
+    }
+  </style>
+  <script type="module" crossorigin src="/assets/index-D3-fZF8E.js"></script>
+</head>
+
+<body>
+  <div id="canvas-container"></div>
+  
+  <div id="ui-overlay">
+    <div id="title">
+      <h1>🌊 Lunar Tides Simulation</h1>
+      <p>Drag the Moon to see how gravity affects Earth's tides</p>
+    </div>
+
+    <div id="controls">
+      <div class="control-group">
+        <div class="control-row">
+          <label>Moon Distance:</label>
+          <input type="range" id="moonDistance" min="3" max="8" step="0.1" value="5">
+          <span class="value-display" id="distanceValue">5.0</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="control-row">
+          <label>Tide Strength:</label>
+          <input type="range" id="tideStrength" min="0.5" max="2.0" step="0.1" value="1.0">
+          <span class="value-display" id="tideValue">1.0</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="control-row">
+          <label>Rotation Speed:</label>
+          <input type="range" id="rotationSpeed" min="0" max="2" step="0.1" value="0.3">
+          <span class="value-display" id="rotationValue">0.3</span>
+        </div>
+      </div>
+
+      <div class="control-group button-group">
+        <button id="orbitToggle">Start Moon Orbit</button>
+        <button id="sunToggle">Toggle Sun</button>
+      </div>
+    </div>
+
+    <div id="info">
+      <h3>How It Works</h3>
+      <ul>
+        <li>High tides occur on sides nearest and farthest from the Moon.</li>
+        <li>Low tides occur perpendicular to the Moon.</li>
+        <li>Drag the Moon to change tide positions.</li>
+        <li>When the Sun aligns → Spring tides (stronger).</li>
+        <li>When Sun is perpendicular → Neap tides (weaker).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">Loading textures...</div>
+
+</body>
+</html>
